@@ -26,10 +26,43 @@ db.serialize(() => {
       thumbnail TEXT,
       description TEXT,
       createdAt TEXT NOT NULL,
+      ord INTEGER DEFAULT 0,
       UNIQUE(userId, videoId),
       FOREIGN KEY(userId) REFERENCES Users(id) ON DELETE CASCADE
     )
   `);
+
+  // Ensure 'ord' column exists for older DBs; if missing, add it and initialize per-user ordering by createdAt
+  db.all("PRAGMA table_info(Favorites)", (err, cols) => {
+    if (err) return;
+    if (!cols.some((c) => c.name === "ord")) {
+      db.run("ALTER TABLE Favorites ADD COLUMN ord INTEGER", (err) => {
+        if (err) return;
+        // initialize ord sequentially per user based on createdAt
+        db.all(
+          "SELECT id, userId FROM Favorites ORDER BY userId, createdAt ASC",
+          (err, rows) => {
+            if (err) return;
+            let lastUser = null;
+            let pos = 0;
+            const updateStmt = db.prepare(
+              "UPDATE Favorites SET ord = ? WHERE id = ?",
+            );
+            rows.forEach((r) => {
+              if (lastUser !== r.userId) {
+                lastUser = r.userId;
+                pos = 1;
+              } else {
+                pos++;
+              }
+              updateStmt.run(pos, r.id);
+            });
+            updateStmt.finalize();
+          },
+        );
+      });
+    }
+  });
 });
 
 module.exports = db;

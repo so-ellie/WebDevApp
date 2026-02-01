@@ -12,4 +12,7 @@ router.post("/videos/save", requireAuth, videoController.saveVideo);
 // delete favorite
 router.post("/videos/delete/:id", requireAuth, videoController.deleteVideo);
 
+// reorder favorites
+router.post("/videos/reorder", requireAuth, videoController.reorder);
+
 module.exports = router;

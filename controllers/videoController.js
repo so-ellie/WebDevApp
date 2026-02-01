@@ -40,3 +40,20 @@ exports.deleteVideo = async (req, res) => {
   }
   res.redirect("/videos");
 };
+
+exports.reorder = async (req, res) => {
+  const orderedIds = req.body && req.body.orderedIds;
+  if (!Array.isArray(orderedIds)) {
+    return res
+      .status(400)
+      .json({ ok: false, error: "orderedIds array required" });
+  }
+
+  try {
+    await favoriteRepo.updateOrder(req.session.user.id, orderedIds);
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("Failed to update order:", err.message);
+    return res.status(500).json({ ok: false, error: "Failed to update order" });
+  }
+};

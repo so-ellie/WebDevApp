@@ -24,6 +24,7 @@ app.set("views", path.join(__dirname, "views"));
 
 // body parsing
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // for JSON requests (reorder requests from client-side JS)
 
 // sessions
 app.use(sessionMiddleware);

@@ -7,6 +7,7 @@ class Favorite {
     thumbnail,
     description,
     createdAt,
+    ord,
   }) {
     this.id = id;
     this.userId = userId;
@@ -15,6 +16,7 @@ class Favorite {
     this.thumbnail = thumbnail;
     this.description = description;
     this.createdAt = createdAt;
+    this.ord = ord;
   }
 }
 
