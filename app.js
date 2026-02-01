@@ -1,7 +1,19 @@
+// Load .env file (if present)
+require("dotenv").config();
+// Warn on missing/placeholder API key to help debug 403 issues
+if (
+  !process.env.YOUTUBE_API_KEY ||
+  process.env.YOUTUBE_API_KEY.startsWith("YOUR_")
+) {
+  console.warn(
+    "\x1b[33mWarning:\x1b[0m YOUTUBE_API_KEY is not set or uses the placeholder. YouTube searches may fail with 403. See YOUTUBE.md for details.",
+  );
+}
 const express = require("express");
 const path = require("path");
 const sessionMiddleware = require("./config/session");
 const authRoutes = require("./routes/authRoutes");
+const videoRoutes = require("./routes/videoRoutes");
 const requireAuth = require("./middleware/requireAuth");
 
 const app = express();
@@ -24,6 +36,7 @@ app.use((req, res, next) => {
 
 // routes
 app.use(authRoutes);
+app.use(videoRoutes);
 
 // protected home
 app.get("/", requireAuth, (req, res) => {
